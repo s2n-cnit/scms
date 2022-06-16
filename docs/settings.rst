@@ -3,7 +3,7 @@
 Settings
 ========
 
-The settings of `RESTable` are set in the file `settings.yaml'.
+The settings of `SCMS` are set in the file `settings.yaml'.
 
 The schema of this file is the following:
 
@@ -16,7 +16,7 @@ The schema of this file is the following:
 +--------------------+-----------------+----------------------------+-----------------------------------+----------+------+
 | ``project``        | String          | Project name               | GUARD                             | True     |      |
 +--------------------+-----------------+----------------------------+-----------------------------------+----------+------+
-| ``title``          | String          | Title of the service.      | RESTable Test                     | True     |      |
+| ``title``          | String          | Title of the service.      | Service Chain Management System   | True     |      |
 +--------------------+-----------------+----------------------------+-----------------------------------+----------+------+
 | ``description``    | String          | Description of the service |                                   | True     |      |
 +--------------------+-----------------+----------------------------+-----------------------------------+----------+------+

@@ -4,11 +4,11 @@
 port: 9999
 debug: false
 project: GUARD
-title: RESTable Test
-description: Testing RESTable features.
+title: SCMS
+description: Service Chain Management System.
 commands:
   list:
-    script: ls
+    scripta: ls
     daemon: false
   current-dir:
     script: pwd
@@ -27,3 +27,10 @@ parameters:
     xpath:
       - agent
       - enabled
+chains:
+  ch1:
+    uri: http://localhost:1111
+    relationship: sibling
+  ch2:
+    uri: http://localhost:2222
+    relationship: child

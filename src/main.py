@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from src.about import version
 from src.libs.console import header
 from src.libs.settings import settings
+from src.routers.chains import router as chains_router
 from src.routers.commands import router as commands_router
 from src.routers.configurations import router as configurations_router
 from src.routers.parameters import router as parameters_router
@@ -22,3 +23,4 @@ app = FastAPI(
 app.include_router(commands_router)
 app.include_router(configurations_router)
 app.include_router(parameters_router)
+app.include_router(chains_router)

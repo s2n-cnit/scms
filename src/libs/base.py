@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Callable, Dict, List, Type, TypeVar
+from typing import Callable, Dict, List, Optional, Type, TypeVar
 
 from aenum import extend_enum
 from fastapi import HTTPException
 from pydantic import BaseModel
+
+from src.libs.settings import settings
 
 T = TypeVar("T", bound="Base")
 
@@ -21,28 +23,43 @@ class Base:
         end: datetime
 
     class Model(BaseModel):
-        history: List[Base.ActionModel]
+        # history: Optional[List[Base.ActionModel]]
+        pass
 
     @classmethod
-    def makeIDs(cls: Type[T]) -> None:
-        for id in cls.data:
+    def load(cls):
+        if cls.path not in settings:
+            raise HTTPException(
+                status_code=404,
+                details=f"{cls.label.title} (path: {cls.path} not found")
+        data = settings.get(cls.path, {})
+        for id in data:
+            data[id].history = []
+        return data
+
+    @ classmethod
+    def init(cls: Type[T]) -> None:
+        cls.InputModel.update_forward_refs()
+        cls.OutputModel.update_forward_refs()
+        for id in cls.load():
             extend_enum(cls.Id, id, id)
 
-    @classmethod
+    @ classmethod
     def get(cls: Type[T], id: T.Id) -> T.SettingModel:
-        if id not in cls.data:
-            raise HTTPException(
-                status_code=404, detail=f"{cls.label.title()} {id} not found"
-            )
-        return cls.data.get(id)
+        data = cls.load()
+        if id not in data:
+            raise HTTPException(status_code=404,
+                                detail=f"{cls.label.title()} {id} not found")
+        return data.get(id)
 
-    @classmethod
+    @ classmethod
     def add(cls: Type[T], id: str, data: Dict[T.ActionModel]) -> None:
-        if "history" not in cls.data[id]:
-            cls.data[id]["history"] = []
-        cls.data[id]["history"].append(data)
+        data = cls.load()
+        if "history" not in data[id]:
+            data[id]["history"] = []
+        data[id]["history"].append(data)
 
-    @staticmethod
+    @ staticmethod
     def process(data: str) -> List[str]:
         try:
             __process = map(lambda item: item.strip(), data.split("\n"))
@@ -50,9 +67,10 @@ class Base:
         except Exception:
             return []
 
-    @classmethod
+    @ classmethod
     def action(
-        cls: Type[T], id: T.Id, callback: Callable, **callback_kwargs: Dict[any, any]
+        cls: Type[T], id: T.Id, callback: Callable,
+        **callback_kwargs: Dict[any, any]
     ) -> T.ActionModel:
         start = datetime.now()
         res = callback(cls.get(id), **callback_kwargs)

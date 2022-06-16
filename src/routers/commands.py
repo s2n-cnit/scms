@@ -6,11 +6,12 @@ from __future__ import annotations
 from enum import Enum
 from subprocess import PIPE, CompletedProcess, Popen, run
 from typing import Dict, Optional
+from urllib import response
 
 from fastapi import APIRouter
+from pydantic import Field
 
 from src.libs.base import Base
-from src.libs.settings import settings
 
 router = APIRouter()
 
@@ -20,53 +21,52 @@ class Commands(Base):
         pass
 
     label = "command"
-    data = settings.get("commands", [])
+    path = "commands"
 
-    class SettingsModel(Base.Model):
-        script: str
-        daemon: Optional[bool] = False
+    class InputModel(Base.Model):
+        script: str = Field(example="ls", description="Command to execute")
+        daemon: Optional[bool] = Field(example=True,
+                                       description='Indicate if the command '
+                                       'has to be executed as daemon',
+                                       default=False)
 
-    class OutputModel(SettingsModel):
+    class OutputModel(InputModel):
         pass
 
 
-Commands.makeIDs()
+Commands.init()
 
 
-@router.get("/commands", description="List all available command settings")
+@router.get("/commands",
+            description="List all available command settings",
+            response_model=Dict[Commands.Id, Commands.OutputModel])
 def get() -> Dict[Commands.Id, Commands.OutputModel]:
     return {command: get_record(command) for command in Commands.Id}
 
 
-@router.get("/commands/{id}", description="Get the command settings")
+@router.get("/commands/{id}",
+            description="Get the command settings",
+            response_model=Commands.OutputModel)
 def get_record(id: Commands.Id) -> Commands.OutputModel:
     return Commands.get(id)
 
 
-@router.post("/commands", description="Execute a set of commands")
+@router.post("/commands",
+             description="Execute a set of commands",
+             response_model=Dict[Commands.Id, Commands.OutputModel])
 def set() -> Dict[Commands.Id, Commands.ActionModel]:
     return {command: set_record(command) for command in Commands.Id}
 
 
-@router.post("/commands/{id}", description="Execute a command")
+@router.post("/commands/{id}",
+             description="Execute a command",
+             response_model=Commands.ActionModel)
 def set_record(id: Commands.Id) -> Commands.ActionModel:
-    def __set_record(command: Commands.SettingsModel) -> CompletedProcess[str] | Popen:
-        if not command.get("daemon", False):
-            return run(
-                command.script,
-                check=False,
-                shell=True,
-                stdout=PIPE,
-                stderr=PIPE,
-                universal_newlines=True,
-            )
-        else:
-            return Popen(
-                command.script,
-                shell=True,
-                stdout=PIPE,
-                stderr=PIPE,
-                start_new_session=True,
-            )
-
+    def __set_record(command: Commands.InputModel) \
+            -> CompletedProcess[str] | Popen:
+        return Popen(command.script, shell=True, stdout=PIPE, stderr=PIPE,
+                     start_new_session=True) \
+            if command.get("daemon", False) else \
+            run(command.script, check=False, shell=True,
+                stdout=PIPE, stderr=PIPE, universal_newlines=True)
     return Commands.action(id, __set_record)

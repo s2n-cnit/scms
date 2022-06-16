@@ -2,5 +2,6 @@
 # author: Alex Carrega <alessandro.carrega@cnit.it>
 
 from dynaconf import Dynaconf
+from watchdog.observers import Observer
 
 settings = Dynaconf(settings_files=["settings.yaml", ".secrets.yaml"])

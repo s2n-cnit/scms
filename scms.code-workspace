@@ -1,7 +1,7 @@
 {
     "folders": [
         {
-            "name": "GUARD RESTable",
+            "name": "SCMS",
             "path": "."
         }
     ],
@@ -23,11 +23,13 @@
             "pyflakes",
             "pylint",
             "pyyaml",
+            "SCMS",
             "shyaml",
             "soutoml",
             "starlette",
             "uvicorn",
             "wrapt"
-        ]
+        ],
+        "esbonio.sphinx.confDir": "${workspaceFolder}/docs"
     }
 }

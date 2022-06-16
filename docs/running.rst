@@ -3,11 +3,10 @@
 Running
 =======
 
-To run `RESTable`:
+To run `SCMS`:
 
 .. code-block:: console
 
-    cd RESTable
+    cd scms
     bash script/start.sh
-
-.. |REST| replace:: :abbr:`REST (Representational State Transfer)`
+å

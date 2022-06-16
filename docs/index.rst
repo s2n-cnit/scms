@@ -1,20 +1,21 @@
-.. RESTable documentation master file.
+.. SCMS documentation master file.
 
-Welcome to RESTable documentation!
+Welcome to SCMS documentation!
 ====================================
 
-Make |HTTP| |REST|  interface for standard |CLI| applications.
+Service Chain Management System.
+
 
 Compatibility
 =============
 
-`RESTable` requires Python 3.5+.
+`SCMS` requires Python 3.5+.
 
 
 Documentation
 =============
 
-This part of the documentation will show you how to get started in using `RESTable`.
+This part of the documentation will show you how to get started in using `SCMS`.
 
 .. toctree::
    :maxdepth: 1
