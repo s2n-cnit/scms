@@ -1,17 +1,16 @@
-# Copyright (c) 2020-2029 GUARD Project (https://www.guard-project.eu)
-# author: Alex Carrega <alessandro.carrega@cnit.it>
+# Copyright (c) 2022-2029 TNT-Lab (https://github.com/tnt-lab-unige-cnit/scms)
+# author: Alex Carrega <alessandro.carrega@unige.it>
 
 from __future__ import annotations
 
 from enum import Enum
 from subprocess import PIPE, CompletedProcess, Popen, run
 from typing import Dict, Optional
-from urllib import response
 
 from fastapi import APIRouter
 from pydantic import Field
 
-from src.libs.base import Base
+from libs.base import Base
 
 router = APIRouter()
 

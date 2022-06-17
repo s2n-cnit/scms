@@ -8,7 +8,7 @@ from aenum import extend_enum
 from fastapi import HTTPException
 from pydantic import BaseModel
 
-from src.libs.settings import settings
+from libs.settings import settings
 
 T = TypeVar("T", bound="Base")
 

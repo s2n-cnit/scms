@@ -1,5 +1,9 @@
 # Copyright (c) 2022-2029 TNT-Lab (https://github.com/tnt-lab-unige-cnit/scms)
 # author: Alex Carrega <alessandro.carrega@unige.it>
 
-[flake8]
-max-line-length = 100
+ch1:
+  uri: http://localhost:1111
+  relationship: sibling
+ch2:
+  uri: http://localhost:2222
+  relationship: child

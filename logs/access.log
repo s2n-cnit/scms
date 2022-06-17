@@ -1,0 +1,21 @@
+INFO     2022-06-16 23:09:32.064 request id: app - uvicorn.server:serve - Started server process [7864]
+INFO     2022-06-16 23:09:32.064 request id: app - uvicorn.lifespan.on:startup - Waiting for application startup.
+INFO     2022-06-16 23:09:32.065 request id: app - uvicorn.lifespan.on:startup - Application startup complete.
+INFO     2022-06-16 23:09:38.035 request id: app - uvicorn.server:shutdown - Shutting down
+INFO     2022-06-16 23:09:38.145 request id: app - uvicorn.lifespan.on:shutdown - Waiting for application shutdown.
+INFO     2022-06-16 23:09:38.152 request id: app - uvicorn.lifespan.on:shutdown - Application shutdown complete.
+INFO     2022-06-16 23:09:38.152 request id: app - uvicorn.server:serve - Finished server process [7864]
+INFO     2022-06-16 23:09:38.729 request id: app - uvicorn.server:serve - Started server process [7966]
+INFO     2022-06-16 23:09:38.729 request id: app - uvicorn.lifespan.on:startup - Waiting for application startup.
+INFO     2022-06-16 23:09:38.729 request id: app - uvicorn.lifespan.on:startup - Application startup complete.
+INFO     2022-06-16 23:10:28.584 request id: app - uvicorn.server:shutdown - Shutting down
+INFO     2022-06-16 23:10:28.688 request id: app - uvicorn.lifespan.on:shutdown - Waiting for application shutdown.
+INFO     2022-06-16 23:10:28.689 request id: app - uvicorn.lifespan.on:shutdown - Application shutdown complete.
+INFO     2022-06-16 23:10:28.690 request id: app - uvicorn.server:serve - Finished server process [7966]
+INFO     2022-06-16 23:10:29.241 request id: app - uvicorn.server:serve - Started server process [8142]
+INFO     2022-06-16 23:10:29.242 request id: app - uvicorn.lifespan.on:startup - Waiting for application startup.
+INFO     2022-06-16 23:10:29.242 request id: app - uvicorn.lifespan.on:startup - Application startup complete.
+INFO     2022-06-17 09:04:03.208 request id: app - uvicorn.server:shutdown - Shutting down
+INFO     2022-06-17 09:04:03.536 request id: app - uvicorn.lifespan.on:shutdown - Waiting for application shutdown.
+INFO     2022-06-17 09:04:03.601 request id: app - uvicorn.lifespan.on:shutdown - Application shutdown complete.
+INFO     2022-06-17 09:04:03.607 request id: app - uvicorn.server:serve - Finished server process [8142]

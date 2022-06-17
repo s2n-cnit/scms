@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2020-2029 GUARD Project (https://www.guard-project.eu)
-# author: Alex Carrega <alessandro.carrega@cnit.it>
+# Copyright (c) 2022-2029 TNT-Lab (https://github.com/tnt-lab-unige-cnit/scms)
+# author: Alex Carrega <alessandro.carrega@unige.it>
 
-PORT=$(cat settings.yaml | shyaml get-value port)
-uvicorn src.main:app --host 0.0.0.0 --port $PORT
+python3 src/main.py
