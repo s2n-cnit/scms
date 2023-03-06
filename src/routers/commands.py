@@ -33,7 +33,9 @@ class Commands(Base):
     class OutputModel(InputModel):
         pass
 
+
 Commands.setup()
+
 
 @router.get("/commands",
             description="List all available command settings",

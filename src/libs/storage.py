@@ -10,8 +10,6 @@ import yaml
 from fastapi import HTTPException
 from pydantic import BaseModel, ValidationError
 
-from libs.reloader import Reloader
-
 log = logging.getLogger(__name__)
 
 

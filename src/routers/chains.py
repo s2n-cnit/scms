@@ -38,7 +38,9 @@ class Chains(Base):
     class OutputModel(InputModel):
         pass
 
+
 Chains.setup()
+
 
 @router.get("/chains",
             description="List all available chains settings",

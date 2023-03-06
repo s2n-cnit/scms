@@ -44,7 +44,9 @@ class Configurations(Base):
                              description="Content of the configuration file",
                              required=True)
 
+
 Configurations.setup()
+
 
 @router.get("/configurations",
             description="List all available configuration settings",

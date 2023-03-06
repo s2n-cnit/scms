@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import json
-from ast import Param
 from enum import Enum
 from functools import partial
 from subprocess import CompletedProcess
@@ -96,7 +95,8 @@ def read(param: Parameters.InputModel) -> any:
             value = content
             for x in param.xpath:
                 value = value.get(x, {})
-            if value == {}: value = None
+            if value == {}:
+                value = None
             return value
     except FileNotFoundError as not_found_err:
         raise HTTPException(status_code=404,
