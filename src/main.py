@@ -6,7 +6,6 @@ from functools import partial
 from fastapi import FastAPI
 
 from about import description, title, version
-from libs.base import Base
 from libs.console import header
 from libs.reloader import Reloader
 from libs.storage import settings
