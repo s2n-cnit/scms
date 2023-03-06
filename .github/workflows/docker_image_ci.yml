@@ -17,7 +17,7 @@ jobs:
             context: version3
             title: SCMS
             description: "Service Chain Management System"
-            url: https://github.com/tnt-lab-unige-cnit/scms
+            url: https://github.com/s2n-cnit/scms
 
     steps:
       - name: Checkout
