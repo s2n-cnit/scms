@@ -1,18 +1,17 @@
-# Copyright (c) 2022-2029 TNT-Lab (https://github.com/tnt-lab-unige-cnit/scms)
+# Copyright (c) 2022-2029 TNT-Lab (https://github.com/s2n-cnit/scms)
 # author: Alex Carrega <alessandro.carrega@unige.it>
 
 from __future__ import annotations
 
 import json
 from enum import Enum
+from functools import partial
 from subprocess import CompletedProcess
 from typing import Any, Callable, Dict
-from urllib import response
 
 import yaml
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from this import d
 
 from libs.base import Base, Format
 
@@ -20,11 +19,17 @@ router = APIRouter()
 
 
 class Configurations(Base):
-    class Id(str, Enum):
+    class Id(str, Enum, metaclass=Base.IdMeta):
         pass
 
-    label = "configuration"
-    path = "configurations"
+    label: str = "configuration"
+    storage_path: str = "config/configurations.yaml"
+    loader: Dict[Format, Callable] = {Format.yaml:
+                                      partial(yaml.load,
+                                              Loader=yaml.SafeLoader),
+                                      Format.json: json.load}
+    dumper: Dict[Format, Callable] = {Format.yaml: yaml.dump,
+                                      Format.json: json.dump}
 
     class InputModel(BaseModel):
         path: str = Field(example="tests/test.json",
@@ -39,27 +44,22 @@ class Configurations(Base):
                              description="Content of the configuration file",
                              required=True)
 
-
-Configurations.init()
-
+Configurations.setup()
 
 @router.get("/configurations",
             description="List all available configuration settings",
             response_model=Dict[Configurations.Id, Configurations.OutputModel])
 def get() -> Dict[Configurations.Id, Configurations.OutputModel]:
-    return {
-        configuration: get_record(configuration) for configuration in Configurations.Id
-    }
+    return {cfg: get_record(cfg) for cfg in Configurations.Id}
 
 
 @router.get("/configurations/{id}",
             description="Get the configuration settings",
             response_model=Configurations.OutputModel)
 def get_record(id: Configurations.Id) -> Configurations.OutputModel:
-    data = Configurations.get(id)
-    read(data, format=Format.yaml, loader=yaml.load)
-    read(data, format=Format.json, loader=json.load)
-    return data
+    cfg: Configurations.InputModel = Configurations.get(id)
+    content = read(cfg)
+    return Configurations.OutputModel(**cfg.dict(), content=content)
 
 
 @router.post("/configurations",
@@ -78,26 +78,29 @@ def set(
 def set_record(
     id: Configurations.Id, content: Dict[Any, Any]
 ) -> Configurations.ActionModel:
-    def __set(configuration: Configurations.Id,
+    def __set(cfg: Configurations.Id,
               content: Any) -> CompletedProcess[str]:
-        write(configuration, content, format=Format.yaml, dumper=yaml.dump)
-        write(configuration, content, format=Format.json, dumper=json.dump)
+        write(cfg, content)
         return CompletedProcess([], returncode=0, stdout="", stderr="")
 
     return Configurations.action(id, __set, content=content)
 
 
-def read(data: Configurations.InputModel,
-         format: Format, loader: Callable) -> None:
-    if data.format == format:
-        with open(data.path, "r") as file:
-            data.update(content=loader(file))
+def read(cfg: Configurations.InputModel) -> any:
+    try:
+        with open(cfg.path, "r") as file:
+            loader: Callable = Configurations.loader[cfg.format]
+            return loader(file)
+    except FileNotFoundError as not_found_err:
+        raise HTTPException(status_code=404,
+                            detail=f"File {cfg.path} not found") from not_found_err
 
 
-def write(
-    data: Configurations.InputModel, content: Any,
-    format: Format, dumper: Callable
-) -> None:
-    if data.format == format:
-        with open(data.path, "w") as file:
+def write(cfg: Configurations.InputModel, content: Any) -> None:
+    try:
+        with open(cfg.path, "w") as file:
+            dumper: Callable = Configurations.dumper[cfg.format]
             dumper(content, file)
+    except FileNotFoundError as not_found_err:
+        raise HTTPException(status_code=404,
+                            detail=f"File {cfg.path} not found") from not_found_err

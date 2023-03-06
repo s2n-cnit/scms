@@ -1,1 +1,2 @@
-'{"log": {"enabled": 1}}'
+agent:
+  period: 1

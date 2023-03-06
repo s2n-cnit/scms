@@ -36,6 +36,7 @@ python_version = "3.9"
 requirements = "bash scripts/requirements.sh"
 start = "bash scripts/start.sh"
 # dev
+dev = "bash scripts/dev.sh"
 changelog = "bat CHANGELOG.md"
 codestyle = "find src -iname '*.py' -exec pycodestyle --first {} \\;"
 complexity = "find src -iname '*.py' -exec python -m mccabe {} \\;"

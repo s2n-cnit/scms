@@ -18,8 +18,6 @@ Configurations Settings Model
 +-------------+-------------------------+-----------------------------------+----------------+----------+
 | ``format``  | Enum(String)[json,yaml] | Format of the configuration file. | yaml           | True     |
 +-------------+-------------------------+-----------------------------------+----------------+----------+
-| ``history`` | List(ActionModel)       | History of configuration updates. |                | True     |
-+-------------+-------------------------+-----------------------------------+----------------+----------+
 
 
 .. _configurations-output-model:

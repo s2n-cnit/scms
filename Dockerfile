@@ -6,7 +6,7 @@ RUN apt-get install git httpie jq fish gcc g++ micro iputils-ping curl -y
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/alexcarrega/oh-my-bash/master/tools/install.sh)"
 
 ARG NOCACHE=true
-RUN git clone https://github.com/tnt-lab-unige-cnit/scms /opt/scms
+RUN git clone https://github.com/s2n-cnit/scms /opt/scms
 RUN chgrp -R 0 /opt/scms && chmod -R g=u /opt/scms
 WORKDIR /opt/scms
 

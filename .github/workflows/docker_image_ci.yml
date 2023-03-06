@@ -1,8 +1,9 @@
 name: Docker Image CI
 
 on:
-  - workflow_dispatch # manual trigger
-  - push
+  pull_request:
+  push:
+  workflow_dispatch: # manual trigger
 
 jobs:
   docker:
@@ -13,7 +14,7 @@ jobs:
         include:
           - component: scms
             version: ${GITHUB_REF##*/}
-            context: .
+            context: version3
             title: SCMS
             description: "Service Chain Management System"
             url: https://github.com/tnt-lab-unige-cnit/scms

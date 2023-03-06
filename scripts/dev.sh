@@ -1,9 +1,6 @@
+#!/bin/bash
+
 # Copyright (c) 2022-2029 TNT-Lab (https://github.com/s2n-cnit/scms)
 # author: Alex Carrega <alessandro.carrega@unige.it>
 
-test-json:
-  path: tests/test.json
-  format: json
-test-yaml:
-  path: tests/test.yaml
-  format: yaml
+python3 src/dev.py

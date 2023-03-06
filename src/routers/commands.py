@@ -1,14 +1,15 @@
-# Copyright (c) 2022-2029 TNT-Lab (https://github.com/tnt-lab-unige-cnit/scms)
+# Copyright (c) 2022-2029 TNT-Lab (https://github.com/s2n-cnit/scms)
 # author: Alex Carrega <alessandro.carrega@unige.it>
 
 from __future__ import annotations
 
 from enum import Enum
+from functools import partial
 from subprocess import PIPE, CompletedProcess, Popen, run
-from typing import Dict, Optional
+from typing import Callable, Dict, Optional
 
 from fastapi import APIRouter
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from libs.base import Base
 
@@ -16,13 +17,13 @@ router = APIRouter()
 
 
 class Commands(Base):
-    class Id(str, Enum):
+    class Id(str, Enum, metaclass=Base.IdMeta):
         pass
 
-    label = "command"
-    path = "commands"
+    label: str = "command"
+    storage_path: str = "config/commands.yaml"
 
-    class InputModel(Base.Model):
+    class InputModel(BaseModel):
         script: str = Field(example="ls", description="Command to execute")
         daemon: Optional[bool] = Field(example=True,
                                        description='Indicate if the command '
@@ -32,9 +33,7 @@ class Commands(Base):
     class OutputModel(InputModel):
         pass
 
-
-Commands.init()
-
+Commands.setup()
 
 @router.get("/commands",
             description="List all available command settings",
@@ -47,7 +46,8 @@ def get() -> Dict[Commands.Id, Commands.OutputModel]:
             description="Get the command settings",
             response_model=Commands.OutputModel)
 def get_record(id: Commands.Id) -> Commands.OutputModel:
-    return Commands.get(id)
+    cmd: Commands.InputModel = Commands.get(id)
+    return Commands.OutputModel(**cmd.dict())
 
 
 @router.post("/commands",
@@ -61,11 +61,10 @@ def set() -> Dict[Commands.Id, Commands.ActionModel]:
              description="Execute a command",
              response_model=Commands.ActionModel)
 def set_record(id: Commands.Id) -> Commands.ActionModel:
-    def __set_record(command: Commands.InputModel) \
-            -> CompletedProcess[str] | Popen:
-        return Popen(command.script, shell=True, stdout=PIPE, stderr=PIPE,
-                     start_new_session=True) \
-            if command.get("daemon", False) else \
-            run(command.script, check=False, shell=True,
-                stdout=PIPE, stderr=PIPE, universal_newlines=True)
-    return Commands.action(id, __set_record)
+    def __set(command: Commands.InputModel) -> CompletedProcess[str] | Popen:
+        fn: Callable = Popen if command.daemon else run
+        call_fn: Callable = partial(fn, shell=True, stdout=PIPE, stderr=PIPE)
+        add_args = dict(start_new_session=True) if command.daemon \
+            else dict(universal_newlines=True)
+        return call_fn(**add_args)
+    return Commands.action(id, __set)

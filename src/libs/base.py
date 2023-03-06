@@ -1,19 +1,22 @@
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
-from typing import Callable, Dict, List, Optional, Type, TypeVar
+from enum import Enum, EnumMeta
+from typing import Callable, Dict, List, Type
 
 from aenum import extend_enum
 from fastapi import HTTPException
 from pydantic import BaseModel
 
-from libs.settings import settings
-
-T = TypeVar("T", bound="Base")
+from libs.reloader import Reloader
+from libs.storage import Storage
 
 
 class Base:
+    class IdMeta(EnumMeta):
+        def __contains__(cls, item):
+            return item in [v.value for v in cls.__members__.values()]
+
     class ActionModel(BaseModel):
         error: bool
         stdout: List[str]
@@ -22,44 +25,30 @@ class Base:
         start: datetime
         end: datetime
 
-    class Model(BaseModel):
-        # history: Optional[List[Base.ActionModel]]
-        pass
+    @classmethod
+    def init(cls: Type[Base]) -> None:
+        for id in cls.Id:
+            if id not in cls.storage.root().keys():
+                cls.Id.__dict__['_member_names_'].remove(id.name)
+        for id in cls.storage.root().keys():
+            if id not in cls.Id:
+                extend_enum(cls.Id, id, id)
 
     @classmethod
-    def load(cls):
-        if cls.path not in settings:
-            raise HTTPException(
-                status_code=404,
-                details=f"{cls.label.title} (path: {cls.path} not found")
-        data = settings.get(cls.path, {})
-        for id in data:
-            data[id].history = []
-        return data
-
-    @ classmethod
-    def init(cls: Type[T]) -> None:
+    def setup(cls: Type[Base]) -> None:
+        cls.storage = Storage(cls.storage_path)
         cls.InputModel.update_forward_refs()
         cls.OutputModel.update_forward_refs()
-        for id in cls.load():
-            extend_enum(cls.Id, id, id)
+        Reloader.add_router_klass(cls.storage_path, cls)
 
-    @ classmethod
-    def get(cls: Type[T], id: T.Id) -> T.SettingModel:
-        data = cls.load()
-        if id not in data:
+    @classmethod
+    def get(cls: Type[Base], id: Base.Id) -> BaseModel:
+        if id not in cls.storage.root():
             raise HTTPException(status_code=404,
                                 detail=f"{cls.label.title()} {id} not found")
-        return data.get(id)
+        return cls.storage.get_model(cls.InputModel, id.name)
 
-    @ classmethod
-    def add(cls: Type[T], id: str, data: Dict[T.ActionModel]) -> None:
-        data = cls.load()
-        if "history" not in data[id]:
-            data[id]["history"] = []
-        data[id]["history"].append(data)
-
-    @ staticmethod
+    @staticmethod
     def process(data: str) -> List[str]:
         try:
             __process = map(lambda item: item.strip(), data.split("\n"))
@@ -67,15 +56,15 @@ class Base:
         except Exception:
             return []
 
-    @ classmethod
+    @classmethod
     def action(
-        cls: Type[T], id: T.Id, callback: Callable,
-        **callback_kwargs: Dict[any, any]
-    ) -> T.ActionModel:
+        cls: Type[Base], id: Base.Id, task: Callable,
+        **task_kwargs: Dict[any, any]
+    ) -> Base.ActionModel:
         start = datetime.now()
-        res = callback(cls.get(id), **callback_kwargs)
+        res = task(cls.get(id), **task_kwargs)
         end = datetime.now()
-        data = cls.ActionModel(
+        return cls.ActionModel(
             error=res.returncode is not None and res.returncode > 0,
             stdout=cls.process(res.stdout),
             stderr=cls.process(res.stderr),
@@ -83,10 +72,9 @@ class Base:
             start=start,
             end=end,
         )
-        cls.add(id, data)
-        return data
 
 
 class Format(str, Enum):
     yaml = "yaml"
     json = "json"
+    property = "ini"

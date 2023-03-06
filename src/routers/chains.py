@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2029 TNT-Lab (https://github.com/tnt-lab-unige-cnit/scms)
+# Copyright (c) 2022-2029 TNT-Lab (https://github.com/s2n-cnit/scms)
 # author: Alex Carrega <alessandro.carrega@unige.it>
 
 from __future__ import annotations
@@ -7,7 +7,7 @@ from enum import Enum
 from typing import Dict
 
 from fastapi import APIRouter
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from libs.base import Base
 
@@ -21,13 +21,13 @@ class Relationship(str, Enum):
 
 
 class Chains(Base):
-    class Id(str, Enum):
+    class Id(str, Enum, metaclass=Base.IdMeta):
         pass
 
-    label = "chain"
-    path = "chains"
+    label: str = "chain"
+    storage_path: str = "config/chains.yaml"
 
-    class InputModel(Base.Model):
+    class InputModel(BaseModel):
         uri: str = Field(example="http://localhost:8080",
                          description="URI of the chain node",
                          required=True)
@@ -38,9 +38,7 @@ class Chains(Base):
     class OutputModel(InputModel):
         pass
 
-
-Chains.init()
-
+Chains.setup()
 
 @router.get("/chains",
             description="List all available chains settings",

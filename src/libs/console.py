@@ -1,20 +1,23 @@
-# Copyright (c) 2022-2029 TNT-Lab (https://github.com/tnt-lab-unige-cnit/scms)
+# Copyright (c) 2022-2029 TNT-Lab (https://github.com/s2n-cnit/scms)
 # author: Alex Carrega <alessandro.carrega@unige.it>
+
+import logging
 
 from rich import pretty, traceback  # noqa: E402
 from rich.console import Console  # noqa: E402
 from rich.panel import Panel  # noqa: E402
 
-from about import version
-from libs.log import log
-from libs.settings import settings
+from about import description, title, version
+from libs.storage import settings
 
 pretty.install()
 traceback.install(show_locals=settings.get("debug", False))
 
+log = logging.getLogger(__name__)
+
 
 def header() -> None:
-    ident: str = f"{settings.project} - {settings.title} v:{version}"
+    ident: str = f"{title} v:{version}"
     console = Console()
     console.print(Panel.fit(ident))
-    log.info(settings.description)
+    log.info(description)

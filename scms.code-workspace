@@ -15,6 +15,7 @@
             "fastapi",
             "graphviz",
             "isort",
+            "klasses",
             "levelname",
             "levelno",
             "mccabe",
